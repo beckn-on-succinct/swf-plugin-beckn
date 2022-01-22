@@ -13,7 +13,7 @@ public interface Subscriber {
     public String getDomain();
 
     default CommunicationPreference getCommunicationPreference(){
-        return ObjectUtil.isVoid(getMq().getProvider()) ? CommunicationPreference.HTTPS : CommunicationPreference.MQ;
+        return ( getMq() == null || ObjectUtil.isVoid( getMq().getProvider()) ) ? CommunicationPreference.HTTPS : CommunicationPreference.MQ;
     }
 
     public Mq getMq();

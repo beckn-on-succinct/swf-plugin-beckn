@@ -100,8 +100,8 @@ public abstract class BppTask extends BecknTask {
             final CloudEventBuilder builder = CloudEventBuilder.v1().withId(context.getMessageId()) // this can be
                     .withType(context.getAction()) // type of event
                     .withSource(URI.create(context.getBppUri())) // event source
-                    .withDataContentType("application/json")
-                    .withData(callbackRequest.toString().getBytes(StandardCharsets.UTF_8));
+                    .withDataContentType("application/octet-stream")
+                    .withData(callbackRequest.toString().getBytes());
 
             generateCallbackHeaders(callbackRequest).forEach((k,v)-> {
                 String key = k.toLowerCase();

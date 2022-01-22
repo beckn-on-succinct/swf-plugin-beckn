@@ -51,7 +51,7 @@ public class Topic {
                 bucket.increment();
                 put(bucket.intValue(),message_id);
             }};
-            int lastIndex = 6;
+            int lastIndex = bucket.intValue();
             while (lastIndex > 0 && levels.get(lastIndex) == null){
                 lastIndex -- ;
             }
@@ -60,17 +60,19 @@ public class Topic {
             for (int i = 0 ; i <= lastIndex ; i ++ ) {
                 String dir = levels.get(i);
                 if (topic.length() > 0){
-                    topic.append(adaptor.getSingleLevelWildCard());
+                    topic.append(adaptor.getSeparatorToken());
                 }
                 if (dir != null ){
                     dir = dir.replace(adaptor.getSeparatorToken(),  "_separator_" );
                     dir = dir.replace(adaptor.getSingleLevelWildCard(),"_wild_");
                     dir = dir.replace(adaptor.getMultiLevelWildCard(),"_multi_wild_");
-
                 }
                 topic.append(dir == null ? adaptor.getSingleLevelWildCard() : dir);
             }
-            topic.append(adaptor.getMultiLevelWildCard());
+            if (lastIndex < bucket.intValue()) {
+                topic.append(adaptor.getSeparatorToken());
+                topic.append(adaptor.getMultiLevelWildCard  ());
+            }
             return new Topic(topic.toString());
         }
         String country = null;
