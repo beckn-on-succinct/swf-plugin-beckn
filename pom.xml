@@ -4,12 +4,12 @@
   <parent>
     <groupId>com.github.venkatramanm.swf-all</groupId>
     <artifactId>swf-all</artifactId>
-    <version>${revision}</version>
-    <relativePath>../swf-all/pom.xml</relativePath>
+    <version>2.8</version>
   </parent>
   <artifactId>swf-plugin-beckn</artifactId>
   <name>swf-plugin-beckn</name>
   <description>swf-plugin-beckn</description>
+  <version>2.8-SNAPSHOT</version>
 
   <url>http://maven.apache.org</url>
   <licenses>
@@ -20,9 +20,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@github.com:venkatramanm/swf-all.git</connection>
-    <developerConnection>scm:git:git@github.com:venkatramanm/swf-all.git</developerConnection>
-    <url>git@github.com:venkatramanm/swf-all.git</url>
+    <connection>scm:git:git@github.com:venkatramanm/swf-plugin-beckn.git</connection>
+    <developerConnection>scm:git:git@github.com:venkatramanm/swf-plugin-beckn.git</developerConnection>
+    <url>https://github.com/venkatramanm/swf-plugin-beckn/tree/master</url>
   </scm>
   <developers>
     <developer> 
@@ -38,7 +38,7 @@
   	<dependency>
         <groupId>${project.groupId}</groupId>
   		  <artifactId>swf</artifactId>
-        <version>${project.version}</version>
+        <version>${project.parent.version}</version>
   	</dependency>
     <dependency>
       <groupId>in.succinct.beckn</groupId>
