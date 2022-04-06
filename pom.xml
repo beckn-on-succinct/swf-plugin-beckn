@@ -9,6 +9,7 @@
   <artifactId>swf-plugin-beckn</artifactId>
   <name>swf-plugin-beckn</name>
   <description>swf-plugin-beckn</description>
+  <version>2.11-SNAPSHOT</version>
 
   <url>http://maven.apache.org</url>
   <licenses>
@@ -37,7 +38,7 @@
   	<dependency>
         <groupId>${project.groupId}</groupId>
   		  <artifactId>swf</artifactId>
-        <version>${project.parent.version}</version>
+        <version>[${project.parent.version},)</version>
   	</dependency>
     <dependency>
       <groupId>in.succinct.beckn</groupId>

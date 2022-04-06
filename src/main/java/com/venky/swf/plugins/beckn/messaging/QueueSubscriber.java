@@ -3,7 +3,7 @@ package com.venky.swf.plugins.beckn.messaging;
 import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.io.ByteArrayInputStream;
 import com.venky.core.string.StringUtil;
-import com.venky.swf.plugins.background.core.AsyncTaskManager;
+import com.venky.swf.plugins.background.core.AsyncTaskManagerFactory;
 import com.venky.swf.plugins.background.core.TaskManager;
 import com.venky.swf.plugins.background.messaging.MessageAdaptor;
 import com.venky.swf.plugins.background.messaging.MessageAdaptor.CloudEventHandler;
@@ -63,7 +63,7 @@ public class QueueSubscriber extends ProxySubscriberImpl {
                                 task.registerSignatureHeaders("Authorization");
                             }
                             if (task.async()){
-                                AsyncTaskManager.getInstance().addAll(Collections.singletonList(task));
+                                AsyncTaskManagerFactory.getInstance().addAll(Collections.singletonList(task));
                             }else {
                                 TaskManager.instance().execute(task);
                             }
