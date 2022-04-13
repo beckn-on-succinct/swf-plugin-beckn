@@ -1,5 +1,6 @@
 package com.venky.swf.plugins.beckn.tasks;
 
+import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.util.ObjectUtil;
 import com.venky.swf.db.annotations.column.ui.mimes.MimeType;
 import com.venky.swf.integration.api.Call;
@@ -33,7 +34,7 @@ public abstract class BppTask extends BecknTask {
     }
 
     public final Map<String,String> generateCallbackHeaders(Request callbackRequest){
-        Map<String,String> headers  = new HashMap<>();
+        Map<String,String> headers  = new IgnoreCaseMap<>();
         if (signatureHeaders.contains("Authorization") && getSubscriber().getPubKeyId() != null) {
             headers.put("Authorization", callbackRequest.generateAuthorizationHeader(
                     callbackRequest.getContext().getBppId(), getSubscriber().getPubKeyId()));
@@ -82,12 +83,13 @@ public abstract class BppTask extends BecknTask {
         if (callbackRequest == null){
             return;
         }
+        BecknApiCall apiCall = BecknApiCall.build().url(callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction()).request(callbackRequest).
+                headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
 
         if (getSubscriber().getCommunicationPreference() == CommunicationPreference.HTTPS) {
-            new Call<JSONObject>().url(callbackRequest.getContext().getBapUri() + "/"+callbackRequest.getContext().getAction()).
-                    method(HttpMethod.POST).inputFormat(InputFormat.JSON).
-                    input(callbackRequest.getInner()).headers(generateCallbackHeaders(callbackRequest)).getResponseAsJson();
+            apiCall.call();
         }else if (getSubscriber().getCommunicationPreference() == CommunicationPreference.MQ){
+            apiCall.validateRequest();
             Mq mq = getSubscriber().getMq();
             Context context = callbackRequest.getContext();
             MessageAdaptor adaptor = MessageAdaptorFactory.getInstance().getMessageAdaptor(mq.getProvider());
