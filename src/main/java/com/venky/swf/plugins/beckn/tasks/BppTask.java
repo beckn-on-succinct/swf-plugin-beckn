@@ -59,7 +59,7 @@ public abstract class BppTask extends BecknTask {
             sendError(ex);
         }
     }
-    public final void sendError(Throwable th) {
+    protected void sendError(Throwable th) {
         Error error = new Error();
 
         StringWriter message = new StringWriter();
@@ -79,9 +79,9 @@ public abstract class BppTask extends BecknTask {
         send(callBackRequest);
     }
 
-    private void send(Request callbackRequest){
+    protected BecknApiCall send(Request callbackRequest){
         if (callbackRequest == null){
-            return;
+            return null;
         }
         BecknApiCall apiCall = BecknApiCall.build().url(callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction()).request(callbackRequest).
                 headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
@@ -114,6 +114,7 @@ public abstract class BppTask extends BecknTask {
 
             queue.publish(topic.toString(),builder.build()); //Publish to call back queue.
         }
+        return apiCall;
     }
 
     public abstract Request generateCallBackRequest();

@@ -40,6 +40,9 @@ public class BecknApiCall {
         this.url = url;
         return this;
     }
+    public String getUrl(){
+        return url;
+    }
     public BecknApiCall url(String baseUrl,String relativeUrl){
         StringBuilder sUrl = new StringBuilder();
         if (baseUrl.endsWith("/")) {
@@ -73,6 +76,9 @@ public class BecknApiCall {
     public BecknApiCall headers(Map<String,String> headers){
         this.headers = headers;
         return this;
+    }
+    public Map<String,String> getHeaders(){
+        return headers;
     }
     private  Request request ;
     public BecknApiCall request(Request request){
