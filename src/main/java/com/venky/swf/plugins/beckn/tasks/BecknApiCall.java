@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.venky.cache.Cache;
 import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.string.StringUtil;
 import com.venky.swf.integration.api.Call;
@@ -196,17 +197,38 @@ public class BecknApiCall {
         }
         return openApi3Request;
     }
-    private static ObjectMapper mapper = new ObjectMapper();
-    private static RequestValidator requestValidator ;
-    static {
-        try {
-            OpenApi3 api = new OpenApi3Parser().parse(Config.class.getResource("/config/core.yaml"), false);
-            requestValidator = new RequestValidator(api);
-        }catch (Exception eX){
-            Config.instance().getLogger(BecknApiCall.class.getName()).log(Level.WARNING,"Unable to load Schema",eX);
-            requestValidator = null;
+
+    private static Map<String,RequestValidator> validatorMap = new Cache<>() {
+        /**
+         *
+         * @param schemaFile (/config/core.yaml)
+         * @return
+         */
+        @Override
+        protected RequestValidator getValue(String schemaFile) {
+            RequestValidator requestValidator = null;
+            try {
+                OpenApi3 api = new OpenApi3Parser().parse(Config.class.getResource(schemaFile), false);
+                requestValidator = new RequestValidator(api);
+            }catch (Exception eX){
+                Config.instance().getLogger(BecknApiCall.class.getName()).log(Level.WARNING,"Unable to load Schema",eX);
+            }
+            return requestValidator;
         }
+    };
+
+    public RequestValidator getRequestValidator(){
+        return validatorMap.get(schemaFile);
     }
+
+    private String schemaFile = "/config/core.yaml";
+    public BecknApiCall schema(String schemaFile){
+        this.schemaFile = schemaFile;
+        return this;
+    }
+
+    private static ObjectMapper mapper = new ObjectMapper();
+
 
     public BecknApiCall call(){
         validateRequest();
@@ -232,7 +254,7 @@ public class BecknApiCall {
         //
         try {
             JsonNode jsonRequest = mapper.readTree(request.toString());
-            requestValidator.validate(getOpenApi3Request());
+            getRequestValidator().validate(getOpenApi3Request());
         }catch (ValidationException ex){
             throw new RuntimeException(ex.toString());
         }catch (JsonProcessingException e) {
@@ -243,7 +265,7 @@ public class BecknApiCall {
     public  void validateResponse(){
         try {
             JsonNode jsonResponse = mapper.readTree(response.toString());
-            requestValidator.validate(getOpenApi3Response(),getOpenApi3Request());
+            getRequestValidator().validate(getOpenApi3Response(),getOpenApi3Request());
         }catch (ValidationException ex){
             throw new RuntimeException(ex.toString());
         }catch (JsonProcessingException e) {
