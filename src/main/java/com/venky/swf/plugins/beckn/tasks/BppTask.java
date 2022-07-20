@@ -60,6 +60,9 @@ public abstract class BppTask extends BecknTask {
         }
     }
     protected void sendError(Throwable th) {
+        sendError(th,null);
+    }
+    protected void sendError(Throwable th, String schemaSource) {
         Error error = new Error();
 
         StringWriter message = new StringWriter();
@@ -76,15 +79,20 @@ public abstract class BppTask extends BecknTask {
         }
         callBackRequest.setError(error);
         Config.instance().getLogger(getClass().getName()).log(Level.WARNING,"Encountered Exception", th);
-        send(callBackRequest);
+        send(callBackRequest,schemaSource);
     }
-
     protected BecknApiCall send(Request callbackRequest){
+        return send(callbackRequest,null);
+    }
+    protected BecknApiCall send(Request callbackRequest,String schemaSource){
         if (callbackRequest == null){
             return null;
         }
         BecknApiCall apiCall = BecknApiCall.build().url(callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction()).request(callbackRequest).
                 headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
+        if (schemaSource != null){
+            apiCall.schema(schemaSource);
+        }
 
         if (getSubscriber().getCommunicationPreference() == CommunicationPreference.HTTPS) {
             apiCall.call();
