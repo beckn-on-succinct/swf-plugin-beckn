@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.venky.cache.Cache;
 import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.string.StringUtil;
+import com.venky.core.util.MultiException;
 import com.venky.swf.integration.api.Call;
 import com.venky.swf.integration.api.HttpMethod;
 import com.venky.swf.integration.api.InputFormat;
 import com.venky.swf.routing.Config;
 import in.succinct.beckn.Request;
 import in.succinct.beckn.Response;
+import org.apache.commons.math3.exception.MultiDimensionMismatchException;
 import org.json.simple.JSONObject;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.operation.validator.model.impl.Body;
@@ -251,6 +253,9 @@ public class BecknApiCall {
 
 
     public void validateRequest(){
+        if (schemaFile == null){
+            return;
+        }
         //
         try {
             JsonNode jsonRequest = mapper.readTree(request.toString());
@@ -264,6 +269,9 @@ public class BecknApiCall {
     }
     public  void validateResponse(){
         try {
+            if (schemaFile  == null){
+                return;
+            }
             JsonNode jsonResponse = mapper.readTree(response.toString());
             getRequestValidator().validate(getOpenApi3Response(),getOpenApi3Request());
         }catch (ValidationException ex){

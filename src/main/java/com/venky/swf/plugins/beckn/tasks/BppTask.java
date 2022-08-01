@@ -90,9 +90,8 @@ public abstract class BppTask extends BecknTask {
         }
         BecknApiCall apiCall = BecknApiCall.build().url(callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction()).request(callbackRequest).
                 headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
-        if (schemaSource != null){
-            apiCall.schema(schemaSource);
-        }
+
+        apiCall.schema(schemaSource);
 
         if (getSubscriber().getCommunicationPreference() == CommunicationPreference.HTTPS) {
             apiCall.call();
