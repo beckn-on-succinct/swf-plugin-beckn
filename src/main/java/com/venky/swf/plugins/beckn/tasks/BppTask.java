@@ -95,9 +95,14 @@ public abstract class BppTask extends BecknTask {
         if (callbackRequest == null){
             return null;
         }
-
-        BecknApiCall apiCall = BecknApiCall.build().url(ObjectUtil.isVoid(overrideUrl) ?
-                            callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction() : overrideUrl).request(callbackRequest).
+        String url = null;
+        BecknApiCall apiCall = BecknApiCall.build();
+        if (!ObjectUtil.isVoid(overrideUrl)){
+            apiCall.url(overrideUrl,callbackRequest.getContext().getAction());
+        }else {
+            apiCall.url(callbackRequest.getContext().getBapUri(),callbackRequest.getContext().getAction());
+        }
+        apiCall.request(callbackRequest).
                 headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
 
         apiCall.schema(schemaSource);
