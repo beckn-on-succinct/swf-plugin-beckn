@@ -35,9 +35,13 @@ public abstract class BppTask extends BecknTask {
 
     public final Map<String,String> generateCallbackHeaders(Request callbackRequest){
         Map<String,String> headers  = new IgnoreCaseMap<>();
-        if (signatureHeaders.contains("Authorization") && getSubscriber().getPubKeyId() != null) {
-            headers.put("Authorization", callbackRequest.generateAuthorizationHeader(
-                    callbackRequest.getContext().getBppId(), getSubscriber().getPubKeyId()));
+        if (callbackRequest.getExtendedAttributes().get("Authorization") != null){
+            headers.put("Authorization",callbackRequest.getExtendedAttributes().get("Authorization"));
+        }else {
+            if (signatureHeaders.contains("Authorization") && getSubscriber().getPubKeyId() != null) {
+                headers.put("Authorization", callbackRequest.generateAuthorizationHeader(
+                        callbackRequest.getContext().getBppId(), getSubscriber().getPubKeyId()));
+            }
         }
         headers.put("Content-Type", MimeType.APPLICATION_JSON.toString());
         headers.put("Accept", MimeType.APPLICATION_JSON.toString());
@@ -85,10 +89,15 @@ public abstract class BppTask extends BecknTask {
         return send(callbackRequest,null);
     }
     protected BecknApiCall send(Request callbackRequest,String schemaSource){
+        return send(null,callbackRequest,schemaSource);
+    }
+    protected BecknApiCall send(String overrideUrl, Request callbackRequest,String schemaSource){
         if (callbackRequest == null){
             return null;
         }
-        BecknApiCall apiCall = BecknApiCall.build().url(callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction()).request(callbackRequest).
+
+        BecknApiCall apiCall = BecknApiCall.build().url(ObjectUtil.isVoid(overrideUrl) ?
+                            callbackRequest.getContext().getBapUri()+"/"+callbackRequest.getContext().getAction() : overrideUrl).request(callbackRequest).
                 headers(generateCallbackHeaders(callbackRequest)).path("/"+callbackRequest.getContext().getAction());
 
         apiCall.schema(schemaSource);
