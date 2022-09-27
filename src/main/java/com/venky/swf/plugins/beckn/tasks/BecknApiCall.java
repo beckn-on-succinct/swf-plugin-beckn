@@ -235,7 +235,8 @@ public class BecknApiCall {
     public BecknApiCall call(){
         validateRequest();
         Call<JSONObject> call = new Call<JSONObject>().url(url).input(request.getInner()).inputFormat(InputFormat.JSON).headers(headers).method(HttpMethod.POST);
-        InputStream is = call.getResponseStream();
+
+        InputStream is = call.timeOut(request.getContext().getTtl()*1000L).getResponseStream();
         if (call.hasErrors()) {
             is = call.getErrorStream();
         }
