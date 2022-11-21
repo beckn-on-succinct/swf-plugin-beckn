@@ -5,6 +5,7 @@ import com.venky.swf.plugins.background.core.Task;
 import com.venky.swf.plugins.beckn.messaging.Subscriber;
 import in.succinct.beckn.Request;
 
+import java.io.Serializable;
 import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +13,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class BecknTask implements Task {
+public abstract class BecknTask implements Task , Serializable {
     private Request request;
     private Map<String,String> headers;
+    protected BecknTask(){
+
+    }
     public BecknTask(Request request, Map<String,String> headers){
         this.request = request;
         this.headers = headers;
@@ -56,7 +60,7 @@ public abstract class BecknTask implements Task {
     }
 
 
-    Subscriber subscriber = null;
+    private transient Subscriber subscriber = null;
     public Subscriber getSubscriber() {
         return subscriber;
     }

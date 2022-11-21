@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public abstract class BppTask extends BecknTask {
+    protected BppTask(){
+        super();
+    }
     public BppTask(Request request,Map<String,String> headers){
         super(request,headers);
     }
