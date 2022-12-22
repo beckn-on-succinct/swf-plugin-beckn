@@ -11,13 +11,13 @@ public interface Subscriber {
     public String getSubscriberId();
     public String getPubKeyId();
     public String getDomain();
+    public Set<String> getSupportedActions();
 
     default CommunicationPreference getCommunicationPreference(){
         return ( getMq() == null || ObjectUtil.isVoid( getMq().getProvider()) ) ? CommunicationPreference.HTTPS : CommunicationPreference.MQ;
     }
 
     public Mq getMq();
-    public Set<String> getSupportedActions();
 
     public abstract <T extends BecknTask>  Class<T> getTaskClass(String action);
 }

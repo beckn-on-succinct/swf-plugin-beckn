@@ -11,7 +11,7 @@ public class BppSubscriber extends QueueSubscriber {
     }
 
     public Set<String> getSupportedActions() {
-        return new HashSet<>(Arrays.asList("search","select","init","confirm","track","cancel","update","status"));
+        return in.succinct.beckn.Subscriber.BPP_ACTION_SET;
     }
 
 }
