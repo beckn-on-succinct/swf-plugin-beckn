@@ -4,7 +4,7 @@ import com.venky.swf.plugins.beckn.tasks.BecknTask;
 
 import java.util.Set;
 
-public class ProxySubscriberImpl implements Subscriber {
+public class ProxySubscriberImpl extends Subscriber {
     @Override
     public String getSubscriberUrl() {
         return subscriber.getSubscriberUrl();
