@@ -260,7 +260,10 @@ public class BecknApiCall {
         //
         try {
             JsonNode jsonRequest = mapper.readTree(request.toString());
-            getRequestValidator().validate(getOpenApi3Request());
+            RequestValidator validator = getRequestValidator();
+            if (validator != null) {
+                validator.validate(getOpenApi3Request());
+            }
         }catch (ValidationException ex){
             throw new RuntimeException(ex.toString());
         }catch (JsonProcessingException e) {
@@ -274,7 +277,10 @@ public class BecknApiCall {
                 return;
             }
             JsonNode jsonResponse = mapper.readTree(response.toString());
-            getRequestValidator().validate(getOpenApi3Response(),getOpenApi3Request());
+            RequestValidator validator = getRequestValidator();
+            if (validator != null){
+                validator.validate(getOpenApi3Response(),getOpenApi3Request());
+            }
         }catch (ValidationException ex){
             throw new RuntimeException(ex.toString());
         }catch (JsonProcessingException e) {
