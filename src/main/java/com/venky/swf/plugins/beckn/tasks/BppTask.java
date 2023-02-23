@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,7 @@ public abstract class BppTask extends BecknTask {
     protected void sendError(Throwable th) {
         sendError(th,null);
     }
-    protected void sendError(Throwable th, String schemaSource) {
+    protected void sendError(Throwable th, URL schemaSource) {
         Error error = new Error();
 
         StringWriter message = new StringWriter();
@@ -91,10 +92,10 @@ public abstract class BppTask extends BecknTask {
     protected BecknApiCall send(Request callbackRequest){
         return send(callbackRequest,null);
     }
-    protected BecknApiCall send(Request callbackRequest,String schemaSource){
+    protected BecknApiCall send(Request callbackRequest, URL schemaSource){
         return send(null,callbackRequest,schemaSource);
     }
-    protected BecknApiCall send(String overrideUrl, Request callbackRequest,String schemaSource){
+    protected BecknApiCall send(String overrideUrl, Request callbackRequest,URL schemaSource){
         if (callbackRequest == null){
             return null;
         }

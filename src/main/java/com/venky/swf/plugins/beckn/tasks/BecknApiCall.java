@@ -1,20 +1,17 @@
 package com.venky.swf.plugins.beckn.tasks;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.venky.cache.Cache;
 import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.string.StringUtil;
-import com.venky.core.util.MultiException;
 import com.venky.swf.integration.api.Call;
 import com.venky.swf.integration.api.HttpMethod;
 import com.venky.swf.integration.api.InputFormat;
 import com.venky.swf.routing.Config;
 import in.succinct.beckn.Request;
 import in.succinct.beckn.Response;
-import org.apache.commons.math3.exception.MultiDimensionMismatchException;
 import org.json.simple.JSONObject;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.operation.validator.model.impl.Body;
@@ -24,6 +21,8 @@ import org.openapi4j.parser.model.v3.OpenApi3;
 
 import javax.servlet.http.Cookie;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -200,17 +199,17 @@ public class BecknApiCall {
         return openApi3Request;
     }
 
-    private static Map<String,RequestValidator> validatorMap = new Cache<>() {
+    private static Map<URL,RequestValidator> validatorMap = new Cache<>() {
         /**
          *
          * @param schemaFile (/config/core.yaml)
          * @return
          */
         @Override
-        protected RequestValidator getValue(String schemaFile) {
+        protected RequestValidator getValue(URL schemaFile) {
             RequestValidator requestValidator = null;
             try {
-                OpenApi3 api = new OpenApi3Parser().parse(Config.class.getResource(schemaFile), false);
+                OpenApi3 api = new OpenApi3Parser().parse(schemaFile, false);
                 requestValidator = new RequestValidator(api);
             }catch (Exception eX){
                 Config.instance().getLogger(BecknApiCall.class.getName()).log(Level.WARNING,"Unable to load Schema",eX);
@@ -220,14 +219,16 @@ public class BecknApiCall {
     };
 
     public RequestValidator getRequestValidator(){
-        return validatorMap.get(schemaFile);
+        return validatorMap.get(schemaUrl);
     }
 
-    private String schemaFile = "/config/core.yaml";
-    public BecknApiCall schema(String schemaFile){
-        this.schemaFile = schemaFile;
+    private URL schemaUrl = null;
+    public BecknApiCall schema(URL schemaUrl){
+        this.schemaUrl = schemaUrl;
+        //Config.class.getResource(schemaFile);
         return this;
     }
+
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -254,7 +255,7 @@ public class BecknApiCall {
 
 
     public void validateRequest(){
-        if (schemaFile == null){
+        if (schemaUrl == null){
             return;
         }
         //
@@ -273,7 +274,7 @@ public class BecknApiCall {
     }
     public  void validateResponse(){
         try {
-            if (schemaFile  == null){
+            if (schemaUrl == null){
                 return;
             }
             JsonNode jsonResponse = mapper.readTree(response.toString());
