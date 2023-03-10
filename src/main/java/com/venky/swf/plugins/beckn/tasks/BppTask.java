@@ -1,6 +1,7 @@
 package com.venky.swf.plugins.beckn.tasks;
 
 import com.venky.core.collections.IgnoreCaseMap;
+import com.venky.core.util.ExceptionUtil;
 import com.venky.core.util.ObjectUtil;
 import com.venky.swf.db.annotations.column.ui.mimes.MimeType;
 import com.venky.swf.integration.api.Call;
@@ -70,11 +71,28 @@ public abstract class BppTask extends BecknTask {
     protected void sendError(Throwable th) {
         sendError(th,null);
     }
-    protected void sendError(Throwable th, URL schemaSource) {
+    protected void sendError(Throwable input, URL schemaSource) {
         Error error = new Error();
 
-        StringWriter message = new StringWriter();
-        th.printStackTrace(new PrintWriter(message));
+        StringBuilder message = new StringBuilder();
+        Throwable th = input ;
+        while (th != null){
+            Throwable cause = th.getCause();
+            String m = th.getMessage();
+            if (cause != null && m != null) {
+                int causeClassNameLength = cause.getClass().getName().length();
+                int startIndex = causeClassNameLength;
+                if (m.length() > startIndex + 2) {
+                    startIndex = startIndex + 2 ;
+                }
+                m = m.substring(startIndex);
+            }
+
+            if (!ObjectUtil.isVoid(m)) {
+                message.append(m);
+            }
+            th = cause;
+        }
         error.setMessage(message.toString());
 
         error.setCode("CALL-FAILED");
@@ -86,7 +104,7 @@ public abstract class BppTask extends BecknTask {
             callBackRequest.getContext().setAction("on_"+getRequest().getContext().getAction());
         }
         callBackRequest.setError(error);
-        Config.instance().getLogger(getClass().getName()).log(Level.WARNING,"Encountered Exception", th);
+        Config.instance().getLogger(getClass().getName()).log(Level.WARNING,"Encountered Exception", input);
         send(callBackRequest,schemaSource);
     }
     protected BecknApiCall send(Request callbackRequest){
