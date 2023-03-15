@@ -45,7 +45,7 @@ public abstract class BecknTask implements Task , Serializable {
     public boolean verifySignatures(boolean throwOnError){
         MultiException ex = new MultiException();
         for (String header  : signatureHeaders){
-            if (!request.verifySignature(header,headers,false)){
+            if (!request.verifySignature(header,headers)){
                 ex.add(new SignatureException(String.format("%s:%s could not be verified!" , header, headers.get(header))));
             }
         }
