@@ -14,10 +14,13 @@ import com.venky.swf.plugins.beckn.messaging.CommunicationPreference;
 import com.venky.swf.plugins.beckn.messaging.Mq;
 import com.venky.swf.plugins.beckn.messaging.Topic;
 import com.venky.swf.routing.Config;
+import in.succinct.beckn.BecknException;
 import in.succinct.beckn.Context;
 import in.succinct.beckn.Error;
 import in.succinct.beckn.Error.Type;
 import in.succinct.beckn.Request;
+import in.succinct.beckn.SellerException;
+import in.succinct.beckn.SellerException.GenericBusinessError;
 import io.cloudevents.core.builder.CloudEventBuilder;
 import org.json.simple.JSONObject;
 
@@ -74,28 +77,43 @@ public abstract class BppTask extends BecknTask {
     protected void sendError(Throwable input, URL schemaSource) {
         Error error = new Error();
 
-        StringBuilder message = new StringBuilder();
-        Throwable th = input ;
-        while (th != null){
-            Throwable cause = th.getCause();
-            String m = th.getMessage();
-            if (cause != null && m != null) {
-                int causeClassNameLength = cause.getClass().getName().length();
-                int startIndex = causeClassNameLength;
-                if (m.length() > startIndex + 2) {
-                    startIndex = startIndex + 2 ;
+        if (input instanceof BecknException){
+            BecknException exception = (BecknException) input;
+            error.setMessage(exception.getMessage());
+            error.setCode(exception.getErrorCode());
+        }else {
+            StringBuilder message = new StringBuilder();
+            Throwable th = input;
+            BecknException exception = null ;
+            while (th != null) {
+                if (th instanceof BecknException){
+                    exception = (BecknException) th;
+                    break;
                 }
-                m = m.substring(startIndex);
-            }
+                Throwable cause = th.getCause();
+                String m = th.getMessage();
+                if (cause != null && m != null) {
+                    int causeClassNameLength = cause.getClass().getName().length();
+                    int startIndex = causeClassNameLength;
+                    if (m.length() > startIndex + 2) {
+                        startIndex = startIndex + 2;
+                    }
+                    m = m.substring(startIndex);
+                }
 
-            if (!ObjectUtil.isVoid(m)) {
-                message.append(m);
+                if (!ObjectUtil.isVoid(m)) {
+                    message.append(m);
+                }
+
+                th = cause;
             }
-            th = cause;
+            if (exception == null){
+                exception = message.length() > 0 ? new GenericBusinessError(message.toString()) : new GenericBusinessError();
+            }
+            error.setMessage(exception.getMessage());
+            error.setCode(exception.getErrorCode());
         }
-        error.setMessage(message.toString());
 
-        error.setCode("CALL-FAILED");
         error.setType(Type.DOMAIN_ERROR);
 
         Request callBackRequest = new Request();
