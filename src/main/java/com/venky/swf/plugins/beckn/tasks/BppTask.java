@@ -3,6 +3,7 @@ package com.venky.swf.plugins.beckn.tasks;
 import com.venky.core.collections.IgnoreCaseMap;
 import com.venky.core.util.ExceptionUtil;
 import com.venky.core.util.ObjectUtil;
+import com.venky.swf.db.Database;
 import com.venky.swf.db.annotations.column.ui.mimes.MimeType;
 import com.venky.swf.integration.api.Call;
 import com.venky.swf.integration.api.HttpMethod;
@@ -46,9 +47,12 @@ public abstract class BppTask extends BecknTask {
         if (callbackRequest.getExtendedAttributes().get("Authorization") != null){
             headers.put("Authorization",callbackRequest.getExtendedAttributes().get("Authorization"));
         }else {
-            if (signatureHeaders.contains("Authorization") && getSubscriber().getPubKeyId() != null) {
-                headers.put("Authorization", callbackRequest.generateAuthorizationHeader(
-                        callbackRequest.getContext().getBppId(), getSubscriber().getPubKeyId()));
+            if (getSubscriber().getPubKeyId() != null) {
+                if (Config.instance().getBooleanProperty("beckn.auth.enabled", false)) {
+                    //signatureHeaders.contains("Authorization") &&
+                    headers.put("Authorization", callbackRequest.generateAuthorizationHeader(
+                            callbackRequest.getContext().getBppId(), getSubscriber().getPubKeyId()));
+                }
             }
         }
         headers.put("Content-Type", MimeType.APPLICATION_JSON.toString());
@@ -61,14 +65,14 @@ public abstract class BppTask extends BecknTask {
                 throw new RuntimeException("Subscriber  not set!");
             }
             Request out = generateCallBackRequest();
-            if (out != null) {
+            if (out != null && !out.isSuppressed()) {
                 if (ObjectUtil.isVoid(out.getContext().getAction())){
                     out.getContext().setAction("on_"+getRequest().getContext().getAction());
                 }
                 send(out);
             }
         }catch (Exception ex){
-            sendError(ex);
+            sendError(ex); // Throws ex to rollback
         }
     }
     protected void sendError(Throwable th) {
@@ -124,6 +128,14 @@ public abstract class BppTask extends BecknTask {
         callBackRequest.setError(error);
         Config.instance().getLogger(getClass().getName()).log(Level.WARNING,"Encountered Exception", input);
         send(callBackRequest,schemaSource);
+        if (input != null){
+            if (input instanceof RuntimeException) {
+                throw (RuntimeException)input;
+            }else {
+                throw new RuntimeException(input);
+            }
+            // To enable rollback.!!
+        }
     }
     protected BecknApiCall send(Request callbackRequest){
         return send(callbackRequest,null);
