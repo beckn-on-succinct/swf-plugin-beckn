@@ -102,7 +102,9 @@ public abstract class BppTask extends BecknTask {
                     if (m.length() > startIndex + 2) {
                         startIndex = startIndex + 2;
                     }
-                    m = m.substring(startIndex);
+                    if (startIndex < m.length()) {
+                        m = m.substring(startIndex);
+                    }
                 }
 
                 if (!ObjectUtil.isVoid(m)) {
