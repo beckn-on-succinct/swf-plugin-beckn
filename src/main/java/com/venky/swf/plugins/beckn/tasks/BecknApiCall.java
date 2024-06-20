@@ -31,75 +31,98 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public class BecknApiCall {
-    private BecknApiCall(){
+    private BecknApiCall() {
 
     }
-    public static BecknApiCall build(){
+
+    public static BecknApiCall build() {
         return new BecknApiCall();
     }
-    private String url ;
-    public BecknApiCall url(String url){
+
+    private String url;
+
+    public BecknApiCall url(String url) {
         this.url = url;
         return this;
     }
-    public String getUrl(){
+
+    public String getUrl() {
         return url;
     }
-    public BecknApiCall url(String baseUrl,String relativeUrl){
+
+    public BecknApiCall url(String baseUrl, String relativeUrl) {
         StringBuilder sUrl = new StringBuilder();
         if (baseUrl.endsWith("/")) {
-            sUrl.append(baseUrl, 0, baseUrl.length()-1);
-        }else {
+            sUrl.append(baseUrl, 0, baseUrl.length() - 1);
+        } else {
             sUrl.append(baseUrl);
         }
-        if (relativeUrl.startsWith("/")){
+        if (relativeUrl.startsWith("/")) {
             sUrl.append(relativeUrl);
-        }else {
+        } else {
             sUrl.append("/").append(relativeUrl);
         }
         url(sUrl.toString());
         return this;
     }
+
     private String path;
-    public BecknApiCall path(String path){
+
+    public BecknApiCall path(String path) {
         this.path = path;
         return this;
     }
 
-    private Map<String,String> cookies = new HashMap<>();
-    public BecknApiCall cookies(Cookie[] aCookies){
-        for (Cookie c : aCookies){
-            cookies.put(c.getName(),c.getValue());
+    private Map<String, String> cookies = new HashMap<>();
+
+    public BecknApiCall cookies(Cookie[] aCookies) {
+        for (Cookie c : aCookies) {
+            cookies.put(c.getName(), c.getValue());
         }
         return this;
     }
 
-    private Map<String,String> headers = new HashMap<>();
-    public BecknApiCall headers(Map<String,String> headers){
+    private Map<String, String> headers = new HashMap<>();
+
+    public BecknApiCall headers(Map<String, String> headers) {
         this.headers = headers;
         return this;
     }
-    public Map<String,String> getHeaders(){
+
+    public Map<String, String> getHeaders() {
         return headers;
     }
-    private  Request request ;
-    public BecknApiCall request(Request request){
+
+    private Request request;
+
+    public BecknApiCall request(Request request) {
         this.request = request;
         return this;
     }
 
-    private  Response response;
-    public Response getResponse(){
+    private Response response;
+
+    public Response getResponse() {
         return response;
     }
-    private BecknApiCall response(Response response){
+
+    private BecknApiCall response(Response response) {
         this.response = response;
         return this;
     }
-    private int status;
-    private BecknApiCall status(int status){
+
+    private int status = -1;
+
+    private void status(int status) {
         this.status = status;
-        return this;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public boolean hasErrors() {
+        return status < 200 || status >= 300;
     }
 
     private Map<String,List<String>> responseHeaders;
