@@ -23,6 +23,7 @@ import javax.servlet.http.Cookie;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -270,7 +271,7 @@ public class BecknApiCall {
             Response ackResponse = new Response(StringUtil.read(is));
             response(ackResponse);
             validateResponse();
-        }catch (NullPointerException ex){
+        }catch (RuntimeException ex){
             response(null);
         }
         return this;
