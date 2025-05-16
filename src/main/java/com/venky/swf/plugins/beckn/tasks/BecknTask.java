@@ -3,6 +3,7 @@ package com.venky.swf.plugins.beckn.tasks;
 import com.venky.core.util.MultiException;
 import com.venky.swf.plugins.background.core.Task;
 import com.venky.swf.plugins.beckn.messaging.Subscriber;
+import com.venky.swf.routing.Config;
 import in.succinct.beckn.Request;
 
 import java.io.Serializable;
@@ -16,8 +17,12 @@ import java.util.Set;
 public abstract class BecknTask implements Task , Serializable {
     private Request request;
     private Map<String,String> headers;
+    private String hostName = null;
+    String getHostName(){
+        return hostName;
+    }
     protected BecknTask(){
-
+    
     }
     public BecknTask(Request request, Map<String,String> headers){
         this.request = request;
@@ -25,6 +30,7 @@ public abstract class BecknTask implements Task , Serializable {
         if (this.headers == null){
             this.headers = new HashMap<>();
         }
+        this.hostName = Config.instance().getHostName(); //Set hostname from calling thread and carry into this classes execute thread.
     }
 
     Set<String> signatureHeaders = new HashSet<>();
