@@ -38,7 +38,6 @@ public abstract class BppTask extends BecknTask {
     protected BppTask(){
         super();
     }
-    
     public BppTask(Request request,Map<String,String> headers){
         super(request,headers);
     }
@@ -62,7 +61,6 @@ public abstract class BppTask extends BecknTask {
     }
     public final void execute(){
         try {
-            Config.instance().setHostName(getHostName());
             if (getSubscriber() == null){
                 throw new RuntimeException("Subscriber  not set!");
             }
