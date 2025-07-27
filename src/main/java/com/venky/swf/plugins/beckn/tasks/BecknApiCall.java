@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.venky.cache.Cache;
 import com.venky.core.collections.IgnoreCaseMap;
+import com.venky.core.io.ByteArrayInputStream;
 import com.venky.core.string.StringUtil;
 import com.venky.swf.integration.api.Call;
 import com.venky.swf.integration.api.HttpMethod;
@@ -23,6 +24,7 @@ import javax.servlet.http.Cookie;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
@@ -259,7 +261,8 @@ public class BecknApiCall {
 
     public BecknApiCall call(){
         validateRequest();
-        Call<JSONObject> call = new Call<JSONObject>().url(url).input(request.getInner()).inputFormat(InputFormat.JSON).headers(headers).method(HttpMethod.POST);
+        Call<InputStream> call = new Call<InputStream>().url(url).input(new ByteArrayInputStream(request.toString().getBytes(StandardCharsets.UTF_8))).
+                inputFormat(InputFormat.INPUT_STREAM).headers(headers).method(HttpMethod.POST);
 
         InputStream is = call.timeOut(request.getContext().getTtl()*1000L).getResponseStream();
         if (call.hasErrors()) {
