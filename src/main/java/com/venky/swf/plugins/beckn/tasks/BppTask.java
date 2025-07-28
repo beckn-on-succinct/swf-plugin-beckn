@@ -44,6 +44,10 @@ public abstract class BppTask extends BecknTask {
 
     public final Map<String,String> generateCallbackHeaders(Request callbackRequest){
         Map<String,String> headers  = new IgnoreCaseMap<>();
+        if (getHeaders().containsKey("ApiKey")){
+            headers.put("ApiKey",getHeaders().get("ApiKey"));
+            //If called with api key, send it back!.
+        }
         if (callbackRequest.getExtendedAttributes().get("Authorization") != null){
             headers.put("Authorization",callbackRequest.getExtendedAttributes().get("Authorization"));
         }else {
