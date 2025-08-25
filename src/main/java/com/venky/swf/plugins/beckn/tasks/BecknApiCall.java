@@ -13,19 +13,16 @@ import com.venky.swf.integration.api.InputFormat;
 import com.venky.swf.routing.Config;
 import in.succinct.beckn.Request;
 import in.succinct.beckn.Response;
-import org.json.simple.JSONObject;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.operation.validator.model.impl.Body;
 import org.openapi4j.operation.validator.validation.RequestValidator;
 import org.openapi4j.parser.OpenApi3Parser;
 import org.openapi4j.parser.model.v3.OpenApi3;
 
-import javax.servlet.http.Cookie;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.HttpCookie;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,8 +75,8 @@ public class BecknApiCall {
 
     private Map<String, String> cookies = new HashMap<>();
 
-    public BecknApiCall cookies(Cookie[] aCookies) {
-        for (Cookie c : aCookies) {
+    public BecknApiCall cookies(HttpCookie[] aCookies) {
+        for (HttpCookie c : aCookies) {
             cookies.put(c.getName(), c.getValue());
         }
         return this;
