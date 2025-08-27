@@ -96,15 +96,14 @@ public class ResponseSynchronizer {
         //ScheduledFuture<?> keepAliveTrigger = null;
         // this is an over kill, we notify on message receipt and on shutdown thats enough.
         ScheduledFuture<?> shutDownTrigger = null;
-        String searchTransactionId = null;
-
+        
         public Tracker(){
 
         }
         public String getMessageId(){
             return request.getContext().getMessageId();
         }
-        public void start(Request request,int maxResponses,String searchTransactionId){
+        public void start(Request request,int maxResponses){
             synchronized (this) {
                 if (this.start <= 0) {
                     this.start = request.getContext().getTimestamp().getTime();
@@ -117,7 +116,6 @@ public class ResponseSynchronizer {
                     this.shutDownTrigger = service.schedule(()->{
                         shutdown();
                     },request.getContext().getTtl() *1000L,TimeUnit.MILLISECONDS);
-                    this.searchTransactionId = searchTransactionId;
                 }
             }
         }

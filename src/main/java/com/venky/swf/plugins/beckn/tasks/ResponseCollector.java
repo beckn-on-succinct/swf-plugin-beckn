@@ -34,7 +34,7 @@ public class ResponseCollector extends HttpTask {
             requests.add(response);
         }
         if (tracker.isComplete()) {
-            ResponseSynchronizer.getInstance().closeTracker(tracker.getMessageId());
+            tracker.close();
             return new BytesView((Path)getPath(), requests.getInner().toString().getBytes(StandardCharsets.UTF_8), MimeType.APPLICATION_JSON);
         }else {
             tracker.registerListener(this);
