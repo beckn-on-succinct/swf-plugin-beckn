@@ -9,6 +9,18 @@
   <artifactId>swf-plugin-beckn</artifactId>
   <name>swf-plugin-beckn</name>
   <description>swf-plugin-beckn</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${maven.compiler.target}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <version>2.14-SNAPSHOT</version>
 
   <url>http://maven.apache.org</url>
