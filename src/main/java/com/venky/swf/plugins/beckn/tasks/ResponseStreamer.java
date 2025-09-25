@@ -10,8 +10,8 @@ import in.succinct.beckn.Request;
 import java.io.IOException;
 
 public class ResponseStreamer extends HttpTask {
-    Tracker tracker ;
-    EventView eventView ;
+    final Tracker tracker ;
+    final EventView eventView ;
     
     @Override
     public boolean isDatabaseAccessed() {
@@ -29,14 +29,16 @@ public class ResponseStreamer extends HttpTask {
     public _IView createView(){
         Request response ;
         try {
-            while ((response = tracker.nextResponse()) != null) {
-                eventView.write(response.toString(), false);
-            }
-            if (tracker.isComplete()){
-                eventView.write(String.format("{\"done\" : true , \"message_id\" : \"%s\"}\n\n", tracker.getMessageId()),true);
-                tracker.close();
-            }else {
-                tracker.registerListener(this);
+            synchronized (tracker){
+                while ((response = tracker.nextResponse()) != null) {
+                    eventView.write(response.toString(), false);
+                }
+                if (tracker.isComplete()){
+                    eventView.write(String.format("{\"done\" : true , \"message_id\" : \"%s\"}\n\n", tracker.getMessageId()),true);
+                    tracker.close();
+                }else {
+                    tracker.registerListener(this);
+                }
             }
             return eventView;
         }catch (IOException ex){
