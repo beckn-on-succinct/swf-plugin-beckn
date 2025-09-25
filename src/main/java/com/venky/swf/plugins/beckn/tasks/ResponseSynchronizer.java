@@ -214,8 +214,9 @@ public class ResponseSynchronizer {
             synchronized (this) {
                 if (listener != null) {
                     Config.instance().getLogger(getClass().getName()).info("Notifying Listener");
-                    AsyncTaskManagerFactory.getInstance().addAll(Collections.singleton(listener));
-                    listener = null;// To prevent resubmits;
+                    CoreTask existing = listener;
+                    listener = null;
+                    AsyncTaskManagerFactory.getInstance().addAll(Collections.singleton(existing));
                 }else {
                     Config.instance().getLogger(getClass().getName()).info("No Listener");
                 }
