@@ -22,7 +22,6 @@ public class ResponseStreamer extends HttpTask {
         super(path);
         this.tracker = tracker;
         this.eventView = new EventView(getPath());
-        tracker.registerListener(this);
     }
     
     @Override
